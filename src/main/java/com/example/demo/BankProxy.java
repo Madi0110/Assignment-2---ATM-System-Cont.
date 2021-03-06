@@ -1,8 +1,13 @@
 package com.example.demo;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.Scanner;
 
 public class BankProxy implements Proxy{
+    Connection connection = null;
+    Statement statement = null;
     public BankProxy(Bank bank, Client client) {
         this.bank = bank;
         this.client = client;
@@ -10,41 +15,57 @@ public class BankProxy implements Proxy{
     Client client;
     Bank bank;
 
+
+
     @Override
     public void withdraw(int cash) {
-        this.bank.withdraw(cash);
+
+        connection = bank.create_DBCon();
 
         if (checkPin(client.getPin())) {
-
-
             if (client.getCash() >= cash) {
-
-                client.setCash(client.getCash() - cash);
-
-                System.out.println("Please collect your money");
-
+                    try {
+                        Double total = client.getCash() - cash;
+                        String query = "update acc set cash = '" + total + "' where id = " + client.getId();
+                        statement = connection.createStatement();
+                        statement.executeUpdate(query);
+                    }
+                    catch (Exception e){
+                        System.out.println(e);
+                    }
+                    System.out.println("Please collect your money");
+                    client.setCash(client.getCash() - cash);
             }
 
         } else{
             System.out.println("Incorrect PIN");
         }
-
     }
 
     @Override
     public void topup(int cash) {
+        connection = bank.create_DBCon();
+
         if (checkPin(client.getPin())) {
+            try {
+                Double total = client.getCash() + cash;
+                String query = "update acc set cash = '" + total + "' where id = " + client.getId();
+                statement = connection.createStatement();
+                statement.executeUpdate(query);
+            } catch (Exception e) {
+                System.out.println(e);
 
+            }
             client.setCash(client.getCash() + cash);
+        } else {
 
-            System.out.println("Your Money has been successfully deposited");
-
-            System.out.println("");
-        }  else{
             System.out.println("Incorrect PIN");
         }
-
     }
+
+
+
+
 
 
     public boolean checkPin(String pin){

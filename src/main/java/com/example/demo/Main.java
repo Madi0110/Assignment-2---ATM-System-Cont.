@@ -1,14 +1,19 @@
 package com.example.demo;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.Random;
 import java.util.Scanner;
+@SpringBootApplication
 public class Main {
 
 
     public static void main(String args[]) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        context.scan("com.example.demo");
+        context.refresh();
         Bank bank = context.getBean("bank", Bank.class);
 
         Main main = new Main();

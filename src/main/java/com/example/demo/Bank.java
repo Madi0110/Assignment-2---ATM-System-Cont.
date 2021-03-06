@@ -1,9 +1,15 @@
 package com.example.demo;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 import java.sql.*;
 import java.util.List;
 
+@Component
 public class Bank implements Proxy {
+    @Autowired
     private List<Client> clients;
     private Connection connection;
     private Statement statement;
@@ -19,13 +25,13 @@ public class Bank implements Proxy {
 
     @Override
     public void withdraw(int cash) {
-
     }
 
     @Override
     public void topup(int cash) {
-
     }
+
+    @PostConstruct
     public void init() throws SQLException {
         Connection connection = this.create_DBCon();
         ResultSet set = null;
@@ -33,7 +39,7 @@ public class Bank implements Proxy {
         statement = connection.createStatement();
         set = statement.executeQuery(query);
         while (set.next()){
-            Client client = new Client(set.getString(1), set.getString(2),set.getString(3),set.getString(4), set.getDouble(5));
+            Client client = new Client(set.getString(1), set.getString(2),set.getString(3),set.getString(4), set.getDouble(5),set.getInt(6));
             this.getClients().add(client);
         }
     }
